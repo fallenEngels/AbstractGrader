@@ -4,10 +4,13 @@ import os
 import random
 import pandas as pd
 
-from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QButtonGroup, QLabel, QFrame, QSizePolicy, QDialog, 
-                               QLineEdit, QDialogButtonBox, QTextEdit, QFileDialog, QComboBox, QMessageBox, QSpacerItem, QProgressBar)
+from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QButtonGroup, QLabel, QFrame, QSizePolicy, 
+                               QFileDialog, QMessageBox, QProgressBar)
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont
+
+from AbstractGrader_options import OptionsWindow
+from AbstractGrader_selector import ColumnSelectionDialog
 
 # Define the path for the .ini file in the same directory as the script
 config_path = os.path.join(os.path.dirname(__file__), 'settings.ini')
@@ -169,7 +172,7 @@ class MainWindow(QMainWindow):
         rq_text = self.cont_rq.text()
 
         # Open the options window, passing current texts
-        options_window = OptionsWindow(self, button_texts=button_texts, rq_text=rq_text)
+        options_window = OptionsWindow(self, button_texts=button_texts, rq_text=rq_text, config_path = config_path)
         options_window.exec()
 
     def load_csv(self):
@@ -332,140 +335,6 @@ class MainWindow(QMainWindow):
                 event.accept()  # Proceed with closing the application if user chose to discard
         else:
             event.accept()  # Proceed with closing the application if no unsaved changes
-
-class OptionsWindow(QDialog):
-    def __init__(self, parent=None, button_texts=None, rq_text=None):
-        super().__init__(parent)
-        self.setWindowTitle("Options")
-        self.initUI()
-
-        # Pre-fill the inputs with current button labels and research question text
-        for i, text in enumerate(button_texts):
-            self.btntext_inputs[i].setText(text)  # Fill button texts
-        self.rqtext_input.setPlainText(rq_text)  # Fill research question
-
-
-    def initUI(self):
-        # Use a QVBoxLayout to arrange the label, input fields, and button vertically
-        main_layout = QVBoxLayout()
-        self.setLayout(main_layout)
-
-        # Research Question Chunk
-        rq_label = QLabel("Research Question:")
-        rq_label.setFont(QFont("Arial", weight=QFont.Bold))
-        rq_label.setAlignment(Qt.AlignCenter)
-        main_layout.addWidget(rq_label)
-        self.rqtext_input = QTextEdit()  # Store as an instance variable
-        self.rqtext_input.setFixedHeight(100)
-        main_layout.addWidget(self.rqtext_input)
-
-        # Button Text Chunk
-        btn_label = QLabel("Category labels:")
-        btn_label.setFont(QFont("Arial", weight=QFont.Bold))
-        btn_label.setAlignment(Qt.AlignCenter)
-        main_layout.addWidget(btn_label)
-
-        # Create a QHBoxLayout for the text input fields
-        btn_layout = QHBoxLayout()
-        self.btntext_inputs = []
-
-        for _ in range(5):
-            btntext_input = QLineEdit()
-            self.btntext_inputs.append(btntext_input)
-            btn_layout.addWidget(btntext_input)
-
-        # Add the input layout to the main layout
-        main_layout.addLayout(btn_layout)
-
-        # Add the "Confirm" button below the input fields
-        confirm_button = QPushButton("Confirm")
-        confirm_button.clicked.connect(self.apply_options)
-        confirm_button.setFixedHeight(50)
-        main_layout.addWidget(confirm_button)
-
-    def apply_options(self):
-        rq_text = self.rqtext_input.toPlainText()
-        self.parent().update_rq_text(rq_text)
-
-        btntexts = [btntext_input.text() for btntext_input in self.btntext_inputs]
-        # Filter out empty inputs
-        btntexts_nonempty = [text for text in btntexts if text]
-        self.parent().update_button_texts(btntexts_nonempty)
-
-        # Save to the .ini file
-        config = configparser.ConfigParser()
-        # Create a section for button labels
-        config['ButtonLabels'] = {f'button_{i+1}': text for i, text in enumerate(btntexts_nonempty)}
-        # Add the research question
-        config['ResearchQuestion'] = {'rq_text': rq_text}
-        # Write to the settings.ini file
-        with open(config_path, 'w') as configfile:
-            config.write(configfile)
-
-        self.accept() # Close the dialog
-
-class ColumnSelectionDialog(QDialog):
-    def __init__(self, columns, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle("Select Columns and Output Column")
-        self.columns = columns
-        self.setGeometry(100, 100, 400, 200)
-
-        # Layouts
-        layout = QVBoxLayout()
-
-        # Title ComboBox
-        self.title_combo = QComboBox()
-        self.title_combo.addItems(self.columns)
-        title_layout = QHBoxLayout()
-        title_layout.addWidget(QLabel("Select Title Column:"))
-        title_layout.addWidget(self.title_combo)
-
-        # Abstract ComboBox
-        self.abstract_combo = QComboBox()
-        self.abstract_combo.addItems(self.columns)
-        abstract_layout = QHBoxLayout()
-        abstract_layout.addWidget(QLabel("Select Abstract Column:"))
-        abstract_layout.addWidget(self.abstract_combo)        
-
-        # Existing Column ComboBox
-        self.existing_combo = QComboBox()
-        self.existing_combo.addItems(self.columns)
-        existing_layout = QHBoxLayout()
-        existing_layout.addWidget(QLabel("Select Existing Output Column:"))
-        existing_layout.addWidget(self.existing_combo)
-
-        # New Column Name Input
-        self.new_column_input = QLineEdit()
-        new_layout = QHBoxLayout()
-        new_layout.addWidget(QLabel("Or Enter New Column Name:"))
-        new_layout.addWidget(self.new_column_input)
-
-        # OK and Cancel buttons
-        button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-        button_box.accepted.connect(self.accept)
-        button_box.rejected.connect(self.reject)
-
-        # Adding widgets to layout
-        layout.addLayout(title_layout)
-        layout.addLayout(abstract_layout)
-        verticalSpacer = QSpacerItem(20, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-        layout.addItem(verticalSpacer)
-        layout.addLayout(existing_layout)
-        layout.addLayout(new_layout)
-        layout.addWidget(button_box)
-
-        self.setLayout(layout)
-
-    def get_selected_columns(self):
-        if self.new_column_input.text().strip():
-            output = self.new_column_input.text()
-        else:
-            output = self.existing_combo.currentText()
-        return (self.title_combo.currentText(), 
-                self.abstract_combo.currentText(), 
-                output)
-
 
 # run app
 if __name__ == "__main__":
