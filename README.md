@@ -15,3 +15,7 @@ The options window allows you to specify a research question. Whatever you put i
 Additionally, the options window lets you specify the labels for up to 5 evaluation options to be displayed in the app. Two important things are to note:
 1. Whatever labels you use here will be written into the CSV file as the paper's evaluation. Pick labels you will understand while evaluating AND when referring back to them at a later date.
 2. You can clear the labels from a button to hide it in the main window, meaning you can either use all 5 categories or simplify the evaluation down to "yes"/"no" without further distractions.
+
+# Requirements
+This is Python code and as such requires Python.
+Packages required are: `pandas` to save, load and edit CSV files and `PySide6` for the UI.
