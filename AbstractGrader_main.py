@@ -5,7 +5,7 @@ import random
 import pandas as pd
 
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QButtonGroup, QLabel, QFrame, QSizePolicy, 
-                               QFileDialog, QMessageBox, QProgressBar)
+                               QFileDialog, QMessageBox, QProgressBar, QScrollArea)
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont
 
@@ -25,15 +25,8 @@ class MainWindow(QMainWindow):
         self.load_settings()
 
     def initUI(self):
-        # Get screen size
-        screen = QApplication.primaryScreen()
-        screen_size = screen.size()
-        max_width = screen_size.width()  # Set maximum width to 80% of screen width
-
-        # Set the window title, size, and maximum width
-        self.setWindowTitle("Abstract Grader v0.5")
-        self.setGeometry(100, 100, 800, 600)
-        self.setMaximumWidth(max_width)
+        self.setWindowTitle("Abstract Grader")
+        self.setGeometry(100, 100, 800, 600) # Initial size
 
         # Create a central widget
         central_widget = QWidget(self)
@@ -107,9 +100,15 @@ class MainWindow(QMainWindow):
         cont_abstract_layout.addWidget(self.cont_abstract)
         cont_abstract_frame.setLayout(cont_abstract_layout)
         cont_abstract_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        main_layout.addWidget(cont_abstract_frame)
 
-        # Create an "Abstract" label
+        # Create a QScrollArea to contain the Abstract
+        scroll_area = QScrollArea(self)
+        scroll_area.setWidget(cont_abstract_frame)
+        scroll_area.setWidgetResizable(True)  # Ensures the widget resizes as necessary
+        scroll_area.setAlignment(Qt.AlignTop)
+        main_layout.addWidget(scroll_area)
+
+        # Create an RQ label
         rq_label = QLabel("Research Question")
         rq_label.setFont(QFont("Arial", weight=QFont.Bold))
         rq_label.setAlignment(Qt.AlignCenter)
@@ -128,7 +127,7 @@ class MainWindow(QMainWindow):
         cont_rq_layout.addWidget(self.cont_rq)
         cont_rq_frame.setLayout(cont_rq_layout)
         cont_rq_frame.setFixedHeight(75)  # Approx. two rows of text
-        cont_rq_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        cont_rq_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         main_layout.addWidget(cont_rq_frame)
 
         answer_layout = QHBoxLayout()

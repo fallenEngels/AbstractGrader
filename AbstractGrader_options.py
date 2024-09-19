@@ -28,7 +28,7 @@ class OptionsWindow(QDialog):
         rq_label.setAlignment(Qt.AlignCenter)
         main_layout.addWidget(rq_label)
         self.rqtext_input = QTextEdit()  # Store as an instance variable
-        self.rqtext_input.setFixedHeight(100)
+        self.rqtext_input.setFixedHeight(65)
         main_layout.addWidget(self.rqtext_input)
 
         # Button Text Chunk
