@@ -75,6 +75,7 @@ class MainWindow(QMainWindow):
         self.cont_title = QLabel("Initial Text 1")
         self.cont_title.setStyleSheet("color: black;")
         self.cont_title.setWordWrap(True)
+        self.cont_title.setTextInteractionFlags(Qt.TextSelectableByMouse | Qt.TextSelectableByKeyboard | Qt.LinksAccessibleByMouse) # allow Copy-Pasting
         cont_title_layout.addWidget(self.cont_title)
         cont_title_frame.setLayout(cont_title_layout)
         cont_title_frame.setFixedHeight(50)  # Approx. two rows of text
@@ -97,6 +98,7 @@ class MainWindow(QMainWindow):
         self.cont_abstract = QLabel("Initial Text 2")
         self.cont_abstract.setStyleSheet("color: black;")
         self.cont_abstract.setWordWrap(True)
+        self.cont_abstract.setTextInteractionFlags(Qt.TextSelectableByMouse | Qt.TextSelectableByKeyboard | Qt.LinksAccessibleByMouse) # allow Copy-Pasting
         cont_abstract_layout.addWidget(self.cont_abstract)
         cont_abstract_frame.setLayout(cont_abstract_layout)
         cont_abstract_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -294,9 +296,10 @@ class MainWindow(QMainWindow):
         if self.output_col:
             total_rows = len(self.csv_data)
             non_empty_rows = len(self.csv_data[self.csv_data[self.output_col].notna()])
+            percentage = round((non_empty_rows / total_rows) * 100, 2)
             self.progress_bar.setMaximum(total_rows)
             self.progress_bar.setValue(non_empty_rows)
-            self.progress_bar.setFormat(f"{non_empty_rows}/{total_rows} rows completed")
+            self.progress_bar.setFormat(f"{non_empty_rows}/{total_rows} rows completed, {percentage}%")
 
     def load_settings(self):
         # Load button labels and research question from the .ini file if it exists.
