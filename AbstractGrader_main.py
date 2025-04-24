@@ -266,8 +266,8 @@ class MainWindow(QMainWindow):
         selected_row = self.csv_data.loc[self.current_row_index]
 
         # Update QLabel texts
-        self.cont_title.setText(selected_row[self.title_col])
-        self.cont_abstract.setText(selected_row[self.abstract_col])
+        self.cont_title.setText(str(selected_row[self.title_col]))
+        self.cont_abstract.setText(str(selected_row[self.abstract_col]))
 
         # Change button label
         self.commit_button.setText("Submit score")
