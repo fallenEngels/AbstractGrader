@@ -259,6 +259,7 @@ class MainWindow(QMainWindow):
         empty_rows = self.csv_data[self.csv_data[self.output_col].isna()]
         if empty_rows.empty:
             QMessageBox.information(self, "No Rows", "No empty Rows left in CSV.")
+            self.update_progress_bar()
             return
 
         # Randomly pick one row
